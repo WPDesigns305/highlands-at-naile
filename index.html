@@ -487,11 +487,11 @@ const nextAd = () => qi < queue.length ? adHTML(queue[qi++]) : null;
 
 /* ---------- Panels ---------- */
 const TABS = [
+  {id:'info', label:'Info'},
+  {id:'sponsors', label:'Sponsors'},
   {id:'junior', label:'Junior'},
   {id:'showmanship', label:'Showmanship'},
-  {id:'open', label:'Open'},
-  {id:'sponsors', label:'Sponsors'},
-  {id:'info', label:'Info'}
+  {id:'open', label:'Open'}
 ];
 const shows = {}; D.shows.forEach(s => shows[s.id] = s);
 
@@ -632,7 +632,7 @@ function searchPanel(q, mineOnly) {
 }
 
 /* ---------- Render ---------- */
-let current = 'junior';
+let current = 'info';
 const main = $('#main');
 function renderTabs() {
   $('#tabs').innerHTML = TABS.map(t => '<button class="tab" role="tab" aria-selected="' + (t.id === current && !$('#q').value && !mineOn()) + '" data-tab="' + t.id + '">' + t.label + '</button>').join('');
@@ -651,7 +651,7 @@ function render() {
   renderTabs();
 }
 function go(tab, scroll=true) {
-  current = TABS.some(t => t.id === tab) ? tab : 'junior';
+  current = TABS.some(t => t.id === tab) ? tab : 'info';
   $('#q').value = ''; $('#mine').setAttribute('aria-pressed','false');
   render();
   if (scroll) window.scrollTo({top: $('.bar').offsetTop - 1 > window.scrollY ? window.scrollY : $('.bar').offsetTop, behavior:'instant'});
@@ -679,12 +679,12 @@ main.addEventListener('click', e => {
 });
 window.addEventListener('beforeprint', () => {
   const pp = D.printpages || {};
-  main.innerHTML = (pp.cover ? '<div class="printpage"><img src="' + pp.cover + '" alt=""></div>' : '') + ['junior','showmanship','open','sponsors','info'].map(t => { current = t; return '<div class="panel">' + (t==='junior'?classPanel(shows.junior):t==='open'?classPanel(shows.open):t==='showmanship'?showmanshipPanel():t==='sponsors'?sponsorsPanel():infoPanel()) + '</div>'; }).join('') + ((D.printpages||{}).back ? '<div class="printpage"><img src="' + D.printpages.back + '" alt=""></div>' : '');
+  main.innerHTML = (pp.cover ? '<div class="printpage"><img src="' + pp.cover + '" alt=""></div>' : '') + ['info','sponsors','junior','showmanship','open'].map(t => { current = t; return '<div class="panel">' + (t==='junior'?classPanel(shows.junior):t==='open'?classPanel(shows.open):t==='showmanship'?showmanshipPanel():t==='sponsors'?sponsorsPanel():infoPanel()) + '</div>'; }).join('') + ((D.printpages||{}).back ? '<div class="printpage"><img src="' + D.printpages.back + '" alt=""></div>' : '');
 });
-window.addEventListener('afterprint', () => go(location.hash.slice(1) || 'junior', false));
+window.addEventListener('afterprint', () => go(location.hash.slice(1) || 'info', false));
 
 const hashTab = location.hash.slice(1).split('-')[0];
-go(hashTab || 'junior', false);
+go(hashTab || 'info', false);
 if (location.hash.includes('-c')) { const el = document.getElementById(location.hash.slice(1)); if (el) el.scrollIntoView(); }
 
 $('#foot').innerHTML = esc(S.show_title) + ' ' + esc(S.year) + '. ' + esc(S.event_name) + ', ' + esc(S.venue) + '. Entries as of ' + esc(D.generated) + '; check the ring for final line-ups.';
