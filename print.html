@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Highlands at NAILE · 2026 Showbook (Print)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+@page{size:letter;margin:0.6in 0.6in 0.7in}
+@page :first{margin:0}
+:root{--peat:#1E2B24;--moss:#3E5A45;--dun:#A3532A;--heather:#6F5B7E;--gold:#C29A2E;--line:#BFC6BC;--soft:#56615A;
+  --serif:"Alegreya",Georgia,"Times New Roman",serif;--sans:"Alegreya Sans","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{margin:0;background:#fff;color:#1E2B24}
+body{font:400 10.5pt/1.45 var(--sans)}
+.page{page-break-after:always;break-after:page}
+.page:last-child{page-break-after:auto;break-after:auto}
+
+/* screen preview: show pages as sheets */
+@media screen{
+  body{background:#9AA39C;padding:24px 0}
+  .page{width:8.5in;min-height:11in;margin:0 auto 24px;background:#fff;padding:0.6in;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+  .page.cover{padding:0}
+  .print-bar{position:sticky;top:0;z-index:5;text-align:center;margin:-24px 0 24px;padding:10px;background:#1E2B24;color:#fff;font:500 15px var(--sans)}
+  .print-bar button{font:inherit;margin-left:10px;padding:6px 14px;border-radius:999px;border:0;background:#fff;color:#1E2B24;cursor:pointer}
+}
+@media print{.print-bar{display:none}}
+
+/* cover */
+.cover{height:11in;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.tartan{flex:0 0 5.4in;position:relative;background-color:var(--peat);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(163,83,42,.6) 0 14px, transparent 14px 46px, rgba(111,91,126,.5) 46px 52px, transparent 52px 92px),
+    repeating-linear-gradient(0deg,  rgba(163,83,42,.6) 0 14px, transparent 14px 46px, rgba(111,91,126,.5) 46px 52px, transparent 52px 92px),
+    repeating-linear-gradient(90deg, rgba(62,90,69,.9) 0 30px, transparent 30px 92px),
+    repeating-linear-gradient(0deg,  rgba(62,90,69,.6) 0 30px, transparent 30px 92px),
+    repeating-linear-gradient(90deg, rgba(194,154,46,.65) 0 2px, transparent 2px 92px);}
+.tartan::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,27,23,0) 30%,rgba(20,27,23,.85))}
+.cover-title{position:absolute;left:0.7in;right:0.7in;bottom:0.45in;z-index:1;color:#fff}
+.cover-title .k{font:500 13pt var(--sans);opacity:.92;margin:0 0 8px}
+.cover-title h1{font:800 66pt/.9 var(--serif);margin:0}
+.cover-body{flex:1;padding:0.5in 0.7in 0.6in;display:flex;gap:0.5in;align-items:flex-start}
+.cover-body .info{flex:1}
+.cover-body .ed{font:800 24pt/1.1 var(--serif);margin:0 0 10px}
+.cover-body .d{font:700 15pt var(--serif);margin:0}
+.cover-body p{margin:4px 0}
+.cover-body .reps{margin-top:22px;padding-top:12px;border-top:2px solid var(--peat)}
+.qr{width:1.9in;text-align:center;font-size:9pt;color:var(--soft)}
+.qr .box{border:2px solid var(--peat);padding:8px;line-height:0;margin-bottom:6px}
+.qr svg{width:100%;height:auto}
+.sample{background:#FFF4CC;color:#5C4500;padding:6px 10px;font-size:9.5pt;margin:0 0 14px}
+
+/* inside pages */
+h2{font:800 24pt/1.1 var(--serif);margin:0 0 4px;color:var(--peat)}
+.sec-lede{color:var(--soft);margin:0 0 14px}
+.band{height:10px;margin:0 0 16px;background-color:var(--peat);
+  background-image:repeating-linear-gradient(90deg,var(--dun) 0 10px,transparent 10px 30px,var(--heather) 30px 34px,transparent 34px 60px)}
+h3{font:700 13pt/1.2 var(--serif);margin:0}
+.welcome{font:500 12.5pt/1.6 var(--serif);max-width:6.2in;margin:0 0 18px}
+.facts{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);margin:0 0 20px}
+.facts div{padding:8px 10px;border-bottom:1px solid var(--line)}
+.facts div:nth-child(odd){border-right:1px solid var(--line)}
+.facts dt{font-size:9pt;color:var(--soft)} .facts dd{margin:0;font-weight:700}
+.sched{width:100%;border-collapse:collapse}
+.sched td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.sched td:first-child{width:1.5in;color:var(--soft)} .sched td:nth-child(2){width:1.5in}
+
+.cls{break-inside:avoid;page-break-inside:avoid;margin:0 0 16px}
+.cls-head{display:flex;gap:10px;align-items:baseline;border-bottom:2px solid var(--peat);padding-bottom:3px}
+.cls-head .n{font:700 10pt var(--sans);color:var(--dun)}
+.cls-head .m{color:var(--soft);font-size:9pt;margin-left:auto}
+table.entries{width:100%;border-collapse:collapse;font-size:9.5pt}
+table.entries th{text-align:left;font:700 8.5pt var(--sans);color:var(--soft);padding:5px 6px;border-bottom:1px solid var(--line)}
+table.entries td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
+table.entries .b{font:800 13pt/1 var(--serif);width:0.5in}
+table.entries .an{font:700 10.5pt var(--serif)}
+table.entries .sm{color:var(--soft);font-size:8.5pt}
+table.entries .pl{width:0.6in;text-align:center}
+.write{display:inline-block;width:0.45in;height:0.26in;border:1px solid var(--peat)}
+.none{color:var(--soft);font-style:italic;padding:6px 0;font-size:9.5pt}
+.champs{border:2px solid var(--peat);padding:10px 12px;margin:6px 0 0;break-inside:avoid}
+.champs h3{margin-bottom:6px}
+.champs .row{display:flex;gap:10px;align-items:flex-end;padding:7px 0}
+.champs .row span:first-child{white-space:nowrap}
+.champs .row .line{flex:1;border-bottom:1px solid var(--peat);min-height:1.1em;font:700 11pt var(--serif)}
+
+.lvl{margin:0 0 16px;break-inside:avoid}
+.lvl-head{display:flex;justify-content:space-between;border-bottom:2px solid var(--peat);padding-bottom:3px;margin-bottom:8px}
+.sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sp{border:1px solid var(--line);padding:10px}
+.sp.partner{grid-column:1/-1;border-left:5px solid var(--dun);padding:14px}
+.sp img{max-height:0.6in;display:block;margin-bottom:6px}
+.sp .nm{font:700 12pt var(--serif)}
+.sp .t{color:var(--soft);font-size:9pt}
+.slot{border:1.5px dashed var(--line);padding:10px;color:var(--soft);font-size:9.5pt}
+.notes .ln{border-bottom:1px solid var(--line);height:0.36in}
+.foot{margin-top:20px;font-size:9pt;color:var(--soft)}
+</style>
+</head>
+<body>
+<div class="print-bar">Print preview: letter size. Use your browser’s print command and turn on “Background graphics.” <button type="button" onclick="window.print()">Print or save as PDF</button></div>
+<div id="book"></div>
+
+<script src="qrcode.js"></script>
+<script src="data.js"></script>
+<script>
+(function(){
+  var D=window.SHOWBOOK, S=D.show, book=document.getElementById("book");
+  if(!D){book.textContent="data.js did not load.";return;}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function where(e){return [e.town,e.state].filter(Boolean).join(", ")}
+  function fmtDate(d){if(!d)return"";var p=d.split("-");if(p.length!==3)return d;return (+p[1])+"/"+(+p[2])+"/"+p[0].slice(2)}
+  function ord(n){n=+n;return n+((n%100>=11&&n%100<=13)?"th":({1:"st",2:"nd",3:"rd"}[n%10]||"th"))}
+  function byBack(a,b){return (parseInt(a.back,10)||0)-(parseInt(b.back,10)||0)}
+  var hasSample=[D.junior.classes,D.open.classes,D.showmanship.divisions].some(function(g){return g.some(function(c){return (c.entries||[]).some(function(e){return e.sample})})});
+  var sampleNote = hasSample ? '<div class="sample">Sample entries are placeholders and will be replaced with the official entry list.</div>' : "";
+
+  var qrSvg="";
+  try{var qr=qrcode(0,"M");qr.addData(D.siteUrl);qr.make();qrSvg=qr.createSvgTag({cellSize:4,margin:0,scalable:true});}catch(e){}
+
+  var h="";
+  /* cover */
+  h+='<section class="page cover"><div class="tartan"><div class="cover-title"><p class="k">'+esc(S.expo)+'</p><h1>'+esc(S.title)+'</h1></div></div>'+
+     '<div class="cover-body"><div class="info"><p class="ed">'+esc(S.edition)+'</p><p class="d">'+esc(S.date)+'</p><p>'+esc(S.venue)+', '+esc(S.city)+'</p><p>'+esc(S.sanction)+'</p>'+
+     '<p style="margin-top:10px">Judge: <strong>'+esc(S.judge||"To be announced")+'</strong></p>'+
+     '<div class="reps"><strong>Breed representatives</strong><br>'+esc(S.reps)+'<br>'+esc(S.email)+'</div></div>'+
+     (qrSvg?'<div class="qr"><div class="box">'+qrSvg+'</div>Scan for the live showbook with results as they are posted</div>':'')+'</div></section>';
+
+  /* welcome & schedule */
+  h+='<section class="page"><div class="band"></div><h2>Welcome</h2>'+sampleNote+'<p class="welcome">'+esc(S.welcome)+'</p>'+
+     '<dl class="facts"><div><dt>Show day</dt><dd>'+esc(S.date)+'</dd></div><div><dt>Location</dt><dd>'+esc(S.venue)+', '+esc(S.city)+'</dd></div>'+
+     '<div><dt>Judge</dt><dd>'+esc(S.judge||"To be announced")+'</dd></div><div><dt>Sanction</dt><dd>'+esc(S.sanction)+'</dd></div></dl>'+
+     '<h3 style="margin-bottom:6px">Schedule</h3><table class="sched">'+D.schedule.map(function(s){return '<tr><td>'+esc(s.day)+'</td><td>'+esc(s.time)+'</td><td><strong>'+esc(s.event)+'</strong></td></tr>'}).join("")+'</table>'+
+     '<p class="foot">Times follow the NAILE ring schedule and may shift with the shows ahead of us.</p></section>';
+
+  function cattleTable(c){
+    var es=(c.entries||[]).slice().sort(byBack);
+    var t='<div class="cls"><div class="cls-head"><span class="n">'+esc(c.num)+'</span><h3>'+esc(c.name)+'</h3><span class="m">'+esc(c.born)+' &nbsp;|&nbsp; '+es.length+' head</span></div>';
+    if(!es.length) return t+'<div class="none">No entries.</div></div>';
+    t+='<table class="entries"><thead><tr><th>Back</th><th>Animal</th><th>Sire / Dam</th><th>Exhibitor</th><th class="pl">Place</th></tr></thead><tbody>';
+    es.forEach(function(e){
+      t+='<tr><td class="b">'+esc(e.back)+'</td><td><div class="an">'+esc(e.animal)+'</div><div class="sm">'+[e.dob?"Born "+fmtDate(e.dob):"",e.reg?"Reg. "+esc(e.reg):""].filter(Boolean).join(" | ")+'</div></td>'+
+         '<td>'+esc(e.sire||"")+'<div class="sm">'+esc(e.dam||"")+'</div></td>'+
+         '<td>'+esc(e.exhibitor)+'<div class="sm">'+esc([e.farm,where(e)].filter(Boolean).join(", "))+'</div></td>'+
+         '<td class="pl">'+(e.place?'<strong>'+ord(e.place)+'</strong>':'<span class="write"></span>')+'</td></tr>';
+    });
+    return t+'</tbody></table></div>';
+  }
+  function champs(title,list){
+    return '<div class="champs"><h3>'+esc(title)+'</h3>'+list.map(function(c){return '<div class="row"><span>'+esc(c.title)+'</span><span class="line">'+esc(c.winner||"")+'</span></div>'}).join("")+'</div>';
+  }
+
+  h+='<section class="page"><div class="band"></div><h2>Junior show</h2><p class="sec-lede">'+esc(D.junior.note)+'</p>'+
+     D.junior.classes.map(cattleTable).join("")+champs("Junior show champions",D.junior.champions)+'</section>';
+
+  h+='<section class="page"><div class="band"></div><h2>Showmanship</h2><p class="sec-lede">'+esc(D.showmanship.note)+'</p>'+
+     D.showmanship.divisions.map(function(v){
+       var es=(v.entries||[]).slice().sort(byBack);
+       var t='<div class="cls"><div class="cls-head"><h3>'+esc(v.name)+'</h3><span class="m">'+esc(v.ages)+' &nbsp;|&nbsp; '+es.length+' showmen</span></div>';
+       if(v.note) t+='<div class="none" style="font-style:normal">'+esc(v.note)+'</div>';
+       if(!es.length) return t+'<div class="none">No entries.</div></div>';
+       t+='<table class="entries"><thead><tr><th>Back</th><th>Showman</th><th>Age</th><th>Hometown</th>'+(v.noRank?'':'<th class="pl">Place</th>')+'</tr></thead><tbody>';
+       es.forEach(function(e){t+='<tr><td class="b">'+esc(e.back)+'</td><td class="an">'+esc(e.exhibitor)+'</td><td>'+esc(e.age||"")+'</td><td>'+esc(where(e))+'</td>'+(v.noRank?'':'<td class="pl">'+(e.place?'<strong>'+ord(e.place)+'</strong>':'<span class="write"></span>')+'</td>')+'</tr>'});
+       return t+'</tbody></table></div>';
+     }).join("")+champs("Showmanship champions",D.showmanship.champions)+'</section>';
+
+  h+='<section class="page"><div class="band"></div><h2>Open show</h2><p class="sec-lede">'+esc(D.open.note)+'</p>'+
+     D.open.classes.map(cattleTable).join("")+champs("Open show champions",D.open.champions)+'</section>';
+
+  /* sponsors */
+  h+='<section class="page"><div class="band"></div><h2>Thank you to our sponsors</h2><p class="sec-lede">This show is funded by people who believe in the breed. Please thank them in the barn and support their businesses.</p>'+
+     D.sponsorLevels.map(function(L){
+       var sp=D.sponsors.filter(function(s){return s.level===L.id});
+       var t='<div class="lvl"><div class="lvl-head"><h3>'+esc(L.name)+'</h3><span>'+esc(L.price)+'</span></div>';
+       if(sp.length) t+='<div class="sp-grid">'+sp.map(function(s){return '<div class="sp'+(L.id==="partner"?" partner":"")+'">'+(s.logo?'<img src="'+esc(s.logo)+'" alt="">':'')+'<div class="nm">'+esc(s.name)+'</div>'+(s.town?'<div class="t">'+esc(s.town)+'</div>':'')+(s.ad?'<div>'+esc(s.ad)+'</div>':'')+'</div>'}).join("")+'</div>';
+       else t+='<div class="slot">Sponsorship available. Contact '+esc(S.email)+'</div>';
+       return t+'</div>';
+     }).join("")+
+     '<p class="foot">Interested in sponsoring? Email '+esc(S.email)+'. Showbook updated '+esc(D.lastUpdated)+'.</p></section>';
+
+  /* notes */
+  h+='<section class="page notes"><div class="band"></div><h2>Notes</h2>'+Array(22).join('<div class="ln"></div>')+'</section>';
+
+  book.innerHTML=h;
+})();
+</script>
+</body>
+</html>
