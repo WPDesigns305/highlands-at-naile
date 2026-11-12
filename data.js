@@ -18,7 +18,7 @@ window.SHOWBOOK = {
 
   // Put the final web address here once the site is hosted.
   // The QR code on the print version and the Share button use it.
-  siteUrl: "https://example.com/highlands-at-naile/",
+  siteUrl: "https://wpdesigns305.github.io/highlands-at-naile/",
 
   show: {
     title: "Highlands at NAILE",
