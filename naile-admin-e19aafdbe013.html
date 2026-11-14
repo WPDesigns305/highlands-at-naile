@@ -356,6 +356,7 @@ body.is-admin .placehint{ display:none; }
   .entry{ break-inside:avoid; }
   .place{ color:transparent !important; background:#fff !important; border:1.5px solid #000 !important; }
   .placehint{ display:none; }
+  .apick{ color:transparent !important; background:#fff !important; border:1px solid #000 !important; -webkit-appearance:none; appearance:none; }
   .entry.scratched .who{ opacity:1 !important; }
   .entry.scratched .aname{ text-decoration:none !important; }
 }
@@ -2867,7 +2868,7 @@ function sortEntries(list) {
 function classPanel(show) {
   const total = show.classes.reduce((n,c) => n + c.entries.length, 0);
   const exh = new Set(); show.classes.forEach(c => c.entries.forEach(e => exh.add(e.exhibitor)));
-  let h = '<div class="showhead"><h2>' + esc(show.title) + '</h2><p>' + (show.when && show.when !== 'TBA' ? esc(show.when) + '.' : 'Time to be announced.') + (show.judge ? ' Judge: ' + esc(show.judge) + '.' : '') + ' ' + total + ' entries from ' + exh.size + ' exhibitors.</p><p class="placehint">Use the box beside each entry to track placings, or SC for a scratch. Saved on this phone only, and printed blank.</p>' + judgeChip(show.title) + '</div>';
+  let h = '<div class="showhead"><h2>' + esc(show.title) + '</h2><p>' + (show.when && show.when !== 'TBA' ? esc(show.when) + '.' : 'Time to be announced.') + (show.judge ? ' Judge: ' + esc(show.judge) + '.' : '') + ' ' + total + ' entries from ' + exh.size + ' exhibitors.</p><p class="placehint">Use the box beside each entry to track placings (or SC for a scratch), and pick champions on the award lines. Saved on this phone only, and printed blank.</p>' + judgeChip(show.title) + '</div>';
   h += '<nav class="jump" aria-label="Jump to class">' + show.classes.map(c => '<a href="#' + show.id + '-c' + c.num + '">' + esc(c.num) + ' ' + esc(c.short) + '</a>').join('') + '</nav>';
   startAds(show.id);
   // Junior: an ad every 2 classes. Open: enough evenly spaced slots that every sponsor not already shown on the Junior/Showmanship tabs gets one.
@@ -3114,14 +3115,14 @@ document.addEventListener('submit', async e => {
 });
 /* ================= ADMIN (official results) — only active in the Admin build ================= */
 const ADMIN = !!D.admin;
-const RES_KEY = 'naile-admin-results-' + (S.year || '');
+const RES_KEY = (D.admin ? 'naile-admin-results-' : 'naile-my-champions-') + (S.year || '');
 let RES = { placings: {}, awards: {}, hunt: {}, savedAt: null };
+try { const r = JSON.parse(localStorage.getItem(RES_KEY) || 'null'); if (r) RES = Object.assign(RES, r); } catch (e) {}
 if (ADMIN) {
-  try { const r = JSON.parse(localStorage.getItem(RES_KEY) || 'null'); if (r) RES = Object.assign(RES, r); } catch (e) {}
   placings = RES.placings;
   TABS.push({ id: 'premier', label: 'Premier' });
 }
-function saveRES() { RES.placings = placings; RES.savedAt = new Date().toISOString(); try { localStorage.setItem(RES_KEY, JSON.stringify(RES)); } catch (e) {} }
+function saveRES() { if (ADMIN) RES.placings = placings; RES.savedAt = new Date().toISOString(); try { localStorage.setItem(RES_KEY, JSON.stringify(RES)); } catch (e) {} }
 const awardId = a => a.show + '|' + a.after + '|' + a.title;
 const normName = s => String(s || '').toLowerCase().replace(/[’']/g, '').replace(/&/g, 'and').replace(/[^a-z0-9 ]/g, ' ').replace(/\b(the|co|company|inc|llc)\b/g, ' ').replace(/\s+/g, ' ').trim();
 const PTS = p => { const n = parseInt(p, 10); return n >= 1 && n <= 5 ? 6 - n : 0; };
@@ -3129,7 +3130,7 @@ const smKey = e => String(e.tag || e.name);
 function placeOf(showId, e, divId) { return showId === 'showmanship' ? (placings['showmanship:' + divId + ':' + smKey(e)] ?? e.placing ?? '') : (placings[showId + ':' + e.tag] ?? e.placing ?? ''); }
 /* Who can be picked on an award line: the classes since the previous division award, or the whole show for grand/supreme awards. */
 function eligible(a) {
-  if (a.show === 'showmanship') { const sm = shows.showmanship; return sm.entries.filter(e => a.after === 'Overall' || e.division === a.after).map(e => ({ v: smKey(e), t: (e.tag ? e.tag + ' — ' : '') + e.name })); }
+  if (a.show === 'showmanship') { const sm = shows.showmanship; return sm.entries.filter(e => a.after === 'Overall' || e.division === a.after).map(e => ({ v: smKey(e), t: (e.tag ? e.tag + ' — ' : '') + e.name, p: placeOf('showmanship', e, e.division), c: e.division })); }
   const show = shows[a.show]; if (!show) return [];
   const isOverall = w => /grand|supreme/i.test(w.title), isDiv = w => !isOverall(w) && !w.single && !w.person && !/premier/i.test(w.title);
   let divStart = 0, allStart = 0, pick = [];
@@ -3139,25 +3140,47 @@ function eligible(a) {
     if (here.some(isDiv)) divStart = i + 1;
     if (here.some(isOverall)) { allStart = i + 1; divStart = i + 1; }
   });
-  const list = []; pick.forEach(x => x.entries.forEach(e => list.push({ v: e.tag, t: e.tag + ' — ' + e.animal + (e.exhibitor !== e.animal ? ' (' + e.exhibitor + ')' : '') })));
+  const list = []; pick.forEach(x => x.entries.forEach(e => list.push({ v: e.tag, t: e.tag + ' — ' + e.animal + (e.exhibitor !== e.animal ? ' (' + e.exhibitor + ')' : ''), p: placeOf(a.show, e), c: x.num })));
   return list;
 }
+/* Champion pickers list the entries that placed first (class winners, or division champions for an overall award),
+   then the rest of the eligible entries. They refresh as placings are entered. */
 function awardPick(a, which) {
-  const cur = (RES.awards[awardId(a)] || {})[which] ?? a[which === 'champion' ? 'champion' : 'reserve'] ?? '';
+  const cur = String((RES.awards[awardId(a)] || {})[which] ?? a[which === 'champion' ? 'champion' : 'reserve'] ?? '');
+  const overall = /grand|supreme/i.test(a.title);
+  const divPicks = {};
+  if (overall) D.awards.filter(w => w.show === a.show && w !== a && !/grand|supreme|premier|peewee/i.test(w.title) && !w.single && !w.person).forEach(w => {
+    const s = RES.awards[awardId(w)] || {}; if (s.champion) divPicks[s.champion] = 'Champion: ' + w.title.replace(/^Champion /, ''); if (s.reserve) divPicks[s.reserve] = divPicks[s.reserve] || ('Reserve: ' + w.title.replace(/^Champion /, ''));
+  });
+  const opts = eligible(a).filter(o => !/^s/i.test(String(o.p)));
+  const label = o => (divPicks[o.v] ? divPicks[o.v] + ' · ' : parseInt(o.p, 10) ? ordinal(o.p) + (a.show === 'showmanship' ? ' ' + o.c : ' Class ' + o.c) + ' · ' : '') + o.t;
+  const score = o => divPicks[o.v] ? (divPicks[o.v].startsWith('Champion') ? 0 : 1) : (parseInt(o.p, 10) || 99) + 1;
+  const top = opts.filter(o => divPicks[o.v] || parseInt(o.p, 10)).sort((x, y) => score(x) - score(y));
+  const rest = opts.filter(o => !top.includes(o));
+  const op = o => '<option value="' + esc(o.v) + '"' + (String(o.v) === cur ? ' selected' : '') + '>' + esc(label(o)) + '</option>';
   return '<select class="apick" data-aid="' + esc(awardId(a)) + '" data-which="' + which + '"><option value="">— select —</option>' +
-    eligible(a).map(o => '<option value="' + esc(o.v) + '"' + (String(o.v) === String(cur) ? ' selected' : '') + '>' + esc(o.t) + '</option>').join('') + '</select>';
+    (top.length ? '<optgroup label="' + (overall && Object.keys(divPicks).length ? 'Division winners' : 'Placed in class') + '">' + top.map(op).join('') + '</optgroup>' + (rest.length ? '<optgroup label="Other entries">' + rest.map(op).join('') + '</optgroup>' : '') : rest.map(op).join('')) + '</select>';
+}
+function refreshPicks() {
+  main.querySelectorAll('select.apick').forEach(s => {
+    const a = D.awards.find(w => awardId(w) === s.dataset.aid); if (!a) return;
+    const tmp = document.createElement('div'); tmp.innerHTML = awardPick(a, s.dataset.which); s.innerHTML = tmp.firstChild.innerHTML;
+    const v = (RES.awards[s.dataset.aid] || {})[s.dataset.which]; if (v) s.value = v;
+  });
 }
 const _awardHTML = awardHTML;
 awardHTML = function (a, show) {
-  if (!ADMIN || a.person || /peewee/i.test(a.title)) return _awardHTML(a, show);
+  if (a.person || /peewee/i.test(a.title) || (!ADMIN && /premier/i.test(a.title))) return _awardHTML(a, show);
   if (/premier/i.test(a.title)) {
     const st = /breeder/i.test(a.title) ? premierOpen('breeder') : premierOpen('exhibitor');
     const top = st.filter(x => x.rank === 1);
     return '<div class="award grand"><h4>' + esc(a.title) + '</h4><div class="rows"><span>Leader</span><span>' + (top.length ? top.map(x => esc(x.name) + ' (' + x.total + ' pts)').join(' &middot; ') + (top.length > 1 ? ' <b class="tie">TIE</b>' : '') : '<span class="tbd">No placings entered yet</span>') + '</span></div><div class="credit">Calculated on the Premier tab</div></div>';
   }
   const grand = /grand|supreme/i.test(a.title), single = a.single;
-  return '<div class="award admin' + (grand ? ' grand' : '') + '"><h4>' + esc(a.title) + '</h4><div class="rows"><span>' + (single ? 'Winner' : 'Champion') + '</span><span>' + awardPick(a, 'champion') + '</span>' +
-    (single ? '' : '<span>Reserve</span><span>' + awardPick(a, 'reserve') + '</span>') + '</div></div>';
+  const rows = '<div class="rows"><span>' + (single ? 'Winner' : 'Champion') + '</span><span>' + awardPick(a, 'champion') + '</span>' +
+    (single ? '' : '<span>Reserve</span><span>' + awardPick(a, 'reserve') + '</span>') + '</div>';
+  // keep the banner sponsor and prize credits from the normal award line
+  return _awardHTML(a, show).replace('class="award', 'class="award admin').replace(/<div class="rows">[\s\S]*?<\/div>/, rows);
 };
 /* ---------- Premier calculations ---------- */
 function premierOpen(kind) {
@@ -3214,10 +3237,13 @@ function premierPanel() {
   h += '<p class="rule" style="margin-top:14px">Ties are shown as TIE. Tie-breakers are at the show’s discretion.</p>';
   return h;
 }
+document.addEventListener('change', e => {
+  const s = e.target.closest('select.apick');
+  if (s) { const a = (RES.awards[s.dataset.aid] = RES.awards[s.dataset.aid] || {}); a[s.dataset.which] = s.value; saveRES(); refreshPicks(); return; }
+  if (e.target.closest('select.place')) setTimeout(refreshPicks, 0);
+});
 if (ADMIN) {
   document.addEventListener('change', e => {
-    const s = e.target.closest('select.apick');
-    if (s) { const a = (RES.awards[s.dataset.aid] = RES.awards[s.dataset.aid] || {}); a[s.dataset.which] = s.value; saveRES(); return; }
     const c = e.target.closest('input[data-hunt]');
     if (c) { RES.hunt[c.dataset.hunt] = c.checked; saveRES(); if (current === 'premier') render(); return; }
     if (e.target.id === 'admfile' && e.target.files[0]) {
