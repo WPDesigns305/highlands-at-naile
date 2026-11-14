@@ -3148,18 +3148,37 @@ function eligible(a) {
 function awardPick(a, which) {
   const cur = String((RES.awards[awardId(a)] || {})[which] ?? a[which === 'champion' ? 'champion' : 'reserve'] ?? '');
   const overall = /grand|supreme/i.test(a.title);
-  const divPicks = {};
-  if (overall) D.awards.filter(w => w.show === a.show && w !== a && !/grand|supreme|premier|peewee/i.test(w.title) && !w.single && !w.person).forEach(w => {
-    const s = RES.awards[awardId(w)] || {}; if (s.champion) divPicks[s.champion] = 'Champion: ' + w.title.replace(/^Champion /, ''); if (s.reserve) divPicks[s.reserve] = divPicks[s.reserve] || ('Reserve: ' + w.title.replace(/^Champion /, ''));
-  });
-  const opts = eligible(a).filter(o => !/^s/i.test(String(o.p)));
-  const label = o => (divPicks[o.v] ? divPicks[o.v] + ' · ' : parseInt(o.p, 10) ? ordinal(o.p) + (a.show === 'showmanship' ? ' ' + o.c : ' Class ' + o.c) + ' · ' : '') + o.t;
-  const score = o => divPicks[o.v] ? (divPicks[o.v].startsWith('Champion') ? 0 : 1) : (parseInt(o.p, 10) || 99) + 1;
-  const top = opts.filter(o => divPicks[o.v] || parseInt(o.p, 10)).sort((x, y) => score(x) - score(y));
-  const rest = opts.filter(o => !top.includes(o));
-  const op = o => '<option value="' + esc(o.v) + '"' + (String(o.v) === cur ? ' selected' : '') + '>' + esc(label(o)) + '</option>';
-  return '<select class="apick" data-aid="' + esc(awardId(a)) + '" data-which="' + which + '"><option value="">— select —</option>' +
-    (top.length ? '<optgroup label="' + (overall && Object.keys(divPicks).length ? 'Division winners' : 'Placed in class') + '">' + top.map(op).join('') + '</optgroup>' + (rest.length ? '<optgroup label="Other entries">' + rest.map(op).join('') + '</optgroup>' : '') : rest.map(op).join('')) + '</select>';
+  const all = eligible(a), pl = o => parseInt(o.p, 10);
+  let opts;
+  if (overall) {
+    // Overall: champion comes from the division champions; reserve from the other division champions
+    // plus the reserve of the division the overall champion came from.
+    const divs = D.awards.filter(w => w.show === a.show && w !== a && !/grand|supreme|premier|peewee/i.test(w.title) && !w.single && !w.person)
+      .map(w => ({ w, s: RES.awards[awardId(w)] || {} })).filter(x => all.some(o => String(o.v) === String(x.s.champion)));
+    const lab = (x, k) => (k === 'champion' ? 'Champion: ' : 'Reserve: ') + x.w.title.replace(/^Champion /, '') + ' · ';
+    const byV = v => all.find(o => String(o.v) === String(v));
+    opts = divs.map(x => ({ ...byV(x.s.champion), pre: lab(x, 'champion') }));
+    if (which === 'reserve') {
+      const champ = String((RES.awards[awardId(a)] || {}).champion || '');
+      opts = opts.filter(o => String(o.v) !== champ);
+      const from = divs.find(x => String(x.s.champion) === champ);
+      if (from && from.s.reserve && byV(from.s.reserve)) opts.push({ ...byV(from.s.reserve), pre: lab(from, 'reserve') });
+    }
+  } else if (which === 'champion' || a.single) {
+    opts = all.filter(o => pl(o) === 1);
+  } else {
+    // Reserve: the other class winners, plus 2nd place in the champion's class
+    const champ = String((RES.awards[awardId(a)] || {}).champion || '');
+    const ch = all.find(o => String(o.v) === champ);
+    opts = all.filter(o => (pl(o) === 1 && String(o.v) !== champ) || (pl(o) === 2 && (!ch || o.c === ch.c)));
+    opts.sort((x, y) => pl(x) - pl(y));
+  }
+  opts = opts.filter(o => o && o.v !== undefined);
+  if (cur && !opts.some(o => String(o.v) === cur)) { const o = all.find(o => String(o.v) === cur); if (o) opts.push(o); }
+  const label = o => (o.pre || (pl(o) ? ordinal(o.p) + (a.show === 'showmanship' ? ' ' + o.c : ' Class ' + o.c) + ' · ' : '')) + o.t;
+  const empty = overall ? 'Pick the division champions first' : 'Place the class' + (a.single ? '' : 'es') + ' first';
+  return '<select class="apick" data-aid="' + esc(awardId(a)) + '" data-which="' + which + '"><option value="">' + (opts.length ? '— select —' : empty) + '</option>' +
+    opts.map(o => '<option value="' + esc(o.v) + '"' + (String(o.v) === cur ? ' selected' : '') + '>' + esc(label(o)) + '</option>').join('') + '</select>';
 }
 function refreshPicks() {
   main.querySelectorAll('select.apick').forEach(s => {
